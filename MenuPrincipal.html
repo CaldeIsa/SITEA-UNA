@@ -1,0 +1,1347 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SITEA-UNA</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+  <!-- Google Font Poppins -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Bootstrap Icons CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+
+  <style>
+    body {font-family: 'Poppins', sans-serif;margin: 0;overflow-x: hidden;background-color: #f3f3f3;}
+
+    /* Sidebar */
+    .sidebar {background-color: #003366;height: 100vh;position: fixed;left: 0;width: 300px;padding-top: 70px;transition: transform 0.3s ease;z-index: 1000;color: white;display: flex;flex-direction: column;justify-content: flex-start; /* Asegura que el contenido no se apile al final */overflow-y: auto; /* Habilita el scroll vertical */}
+
+    .sidebar-header {position: absolute;top: 10px;left: 10px;font-weight: bold;font-size: 1.2rem;}
+
+    .sidebar-title {text-align: center;font-size: 0.85rem;margin: 10px 10px 5px;padding: 0 10px;font-weight: 500;color: #ccc;}
+
+    /* Evitar que el contenido se desborde */
+    .sidebar a {margin: 5px 0;color: white;padding: 10px 20px;display: block;text-decoration: none;font-weight: 500;white-space: nowrap; /* Evita el desbordamiento del texto */}
+
+    /* Si el contenido es largo, aparecerá un scroll */
+    .sidebar .nav {flex-grow: 1;}
+
+    .sidebar a:hover,
+    .sidebar .active {background-color: #005cbf;color: white !important;cursor: pointer;}
+
+    .sidebar .collapse.show {background-color: #002244;}
+    .sidebar-close {transform: translateX(-101%);}
+    .sidebar-footer {text-align: center;padding: 10px;font-size: 0.75rem;color: #aaa;}
+    .content-wrapper {margin-left: 300px;padding: 25px 40px;transition: margin-left 0.3s ease;}
+    .sidebar-close ~ .content-wrapper {margin-left: 20px;}
+
+    .toggle-btn {position: fixed;top: 10px;left: 10px;background: #003366;border: none;color: white !important;font-size: 1.8rem;z-index: 1100;padding: 6px 10px;border-radius: 6px;transition: background 0.3s;}
+
+    .toggle-btn:hover {background-color: #005cbf;}
+    .toggle-btn::before {content: "☰";}
+    .toggle-btn.active::before {content: "✖";}
+
+    .header-buttons {display: flex;justify-content: start;margin-bottom: 20px;flex-wrap: wrap;z-index: 500;position: relative;}
+    .header-buttons button {margin-right: 10px;font-weight: bold;background-color: white;border: 2px solid #003366;color: #003366;border-radius: 5px;padding: 6px 12px;transition: 0.3s;}
+    .header-buttons button:hover {background-color: #003366;color: white;}
+    .header-buttons .active-btn {background-color: #003366;color: white;}
+
+    .content {background-color: white;padding: 30px;border-radius: 12px;box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);min-height: 70vh;}
+
+    .hidden {display: none;}
+    .nav-link i {font-size: 1.5rem;padding: 8px;box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.15);margin-right: 10px; /* Espacio entre el icono y el texto */transition: transform 0.3s ease, box-shadow 0.3s ease;}
+
+    .nav-link:hover i {transform: scale(1.15);box-shadow: 3px 3px 12px rgba(0, 0, 0, 0.25);}
+    .nav-link {display: flex;align-items: center;gap: 20px; /* Más espacio entre el icono y el texto */padding: 12px 20px; /* Mayor espaciado para un efecto más limpio */border-radius: 10px;transition: background-color 0.3s ease;}
+    .nav-link:hover {background-color: #f0f0f0;text-decoration: none;}
+
+    /* Colores por sección */
+    .icon-formularios { background-color: #5BAA99; }
+    .icon-asistencia { background-color: #F17E1D; }
+    .icon-correos { background-color: #C03B8E; }
+    .icon-datos { background-color: 	#A3C61D;}
+    .icon-reportes { background-color: #2F519E; }
+    .icon-busqueda { background-color: #5BAA99; }
+
+    input[type="checkbox"] {position: relative;width: 20px;height: 20px;border: 2px solid #003366; /* Rojo UNA */border-radius: 4px;background-color: #fff;cursor: pointer;outline: none;transition: all 0.2s ease;vertical-align: middle;margin-right: 8px;}
+
+    .custom-alert {border-radius: 0.5rem;box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);position: relative;}
+
+    .priority-dot {width: 16px;height: 16px;top: 8px;right: 8px;z-index: 1;border: 2px solid white;}
+
+  </style>
+</head>
+<body>
+
+  <button class="toggle-btn" id="toggleSidebarBtn"></button>
+
+  <div class="sidebar" id="sidebar">
+    <div>
+      <div class="sidebar-title">SITEA-UNA Sistema de tutorías académicas de la UNA</div>
+      <div class="sidebar-title" style="color:white"><strong>MENÚ</strong></div>
+      <ul class="navbar-nav flex-column mt-3">
+
+        <!-- Formularios -->
+        <li class="nav-item">
+          <a class="nav-link" data-bs-toggle="collapse" href="#submenuFormularios" role="button">
+            <i class="bi bi-ui-checks-grid icon-formularios"></i> Formularios
+          </a>
+          <div class="collapse" id="submenuFormularios">
+            <ul class="nav flex-column ms-3">
+              <li class="nav-item" onclick="loadContent('Crear Formulario')"><a class="nav-link"><i class="bi bi-file-earmark-plus"></i>Crear</a></li>
+              <li class="nav-item" onclick="loadContent('Eliminar Formulario')"><a class="nav-link"><i class="bi bi-file-earmark-x"></i>Eliminar</a></li>
+              <li class="nav-item" onclick="loadContent('Crear Complementos')"><a class="nav-link"><i class="bi bi-puzzle"></i>Complementos SOD</a></li>
+              <li class="nav-item" onclick="loadContent('Crear Complementos Sedes')"><a class="nav-link"><i class="bi bi-puzzle"></i>Complementos Sedes</a></li>
+            </ul>
+          </div>
+        </li>
+
+        <!-- Hoja de asistencia -->
+        <li class="nav-item">
+          <a class="nav-link" data-bs-toggle="collapse" href="#submenuAsistencia" role="button">
+            <i class="bi bi-clipboard-check icon-asistencia"></i> Hoja de asistencia
+          </a>
+          <div class="collapse" id="submenuAsistencia">
+            <ul class="nav flex-column ms-3">
+              <li class="nav-item" onclick="loadContent('Crear Hoja Asistencia')"><a class="nav-link"><i class="bi bi-file-earmark-plus"></i>Crear</a></li>
+              <li class="nav-item" onclick="loadContent('Eliminar Hoja Asistencia')"><a class="nav-link"><i class="bi bi-trash3"></i>Eliminar</a></li>
+              <li class="nav-item" onclick="loadContent('Actualizar Datos Hoja Asistencia')"><a class="nav-link"><i class="bi bi-pencil-square"></i>Actualizar Datos</a></li>
+            </ul>
+          </div>
+        </li>
+
+        <!-- Correos -->
+        <li class="nav-item">
+          <a class="nav-link" data-bs-toggle="collapse" href="#submenuCorreos" role="button">
+            <i class="bi bi-envelope-paper icon-correos"></i> Correos
+          </a>
+          <div class="collapse" id="submenuCorreos">
+            <ul class="nav flex-column ms-3">
+              <li class="nav-item" onclick="loadContent('Correos Tutores')"><a class="nav-link"><i class="bi bi-person-lines-fill"></i>Tutores</a></li>
+              <li class="nav-item" onclick="loadContent('Correos Estudiantes')"><a class="nav-link"><i class="bi bi-people-fill"></i>Estudiantes</a></li>
+              <li class="nav-item" onclick="loadContent('Correos Todos')"><a class="nav-link"><i class="bi bi-envelope-plus"></i>Tutoría completa</a></li>
+            </ul>
+          </div>
+        </li>
+
+        <!-- Datos -->
+        <li class="nav-item" onclick="loadContent('Actualizar Datos')">
+          <a class="nav-link" data-bs-toggle="collapse" href="#submenuDatos" role="button">
+            <i class="bi bi-database-fill icon-datos"></i> Datos
+          </a>
+        </li>
+
+        <!-- Reportes -->
+        <li class="nav-item">
+          <a class="nav-link" data-bs-toggle="collapse" href="#submenuReportes" role="button">
+            <i class="bi bi-bar-chart-line-fill icon-reportes"></i> Reportes
+          </a>
+          <div class="collapse" id="submenuReportes">
+            <ul class="nav flex-column ms-3">
+              <li class="nav-item"><a class="nav-link"><i class="bi bi-person-lines-fill"></i>Tutores</a></li>
+              <li class="nav-item" onclick="loadContent('Crear SESAE')"><a class="nav-link"><i class="bi bi-journal-text"></i>SESAE</a></li>
+              <li class="nav-item" onclick="loadContent('Reporte Evaluaciones')"><a class="nav-link"><i class="bi bi-journal-text"></i>Evaluaciones</a></li>
+              <li class="nav-item"><a class="nav-link"><i class="bi bi-person-fill"></i>Estudiantes</a></li>
+              <li class="nav-item" onclick="loadContent('Reporte Participacion')"><a class="nav-link"><i class="bi bi-folder-fill"></i>Participacion</a></li>
+              <li class="nav-item" onclick="loadContent('Crear POA')"><a class="nav-link"><i class="bi bi-folder-fill"></i>POA</a></li>
+            </ul>
+          </div>
+        </li>
+
+        <!-- Busqueda -->
+        <li class="nav-item">
+          <a class="nav-link" data-bs-toggle="collapse" href="#submenuBusqueda" role="button">
+            <i class=" bi-search icon-busqueda"></i> Busqueda
+          </a>
+          <div class="collapse" id="submenuBusqueda">
+            <ul class="nav flex-column ms-3">
+              <li class="nav-item" onclick="loadContent('Busqueda Estudiante')"><a class="nav-link"><i class="bi bi-person-fill"></i>Búsqueda estudiante</a></li>
+              <li class="nav-item"><a class="nav-link"><i class="bi bi-folder-fill"></i>Búsqueda tutor</a></li>
+            </ul>
+          </div>
+        </li>
+
+      </ul>
+    </div>
+    <div class="sidebar-footer">
+      © 2025 Isaac Calderón Navarro. Sistema de Tutorías Académicas de la UNA. Todos los derechos reservados.
+    </div>
+  </div>
+
+  <div class="content-wrapper">
+    <div class="header-buttons">
+      <button id="btnSod" class="btn active-btn">SOD</button>
+      <button id="btnSedes" class="btn">Sedes</button>
+      <button id="loadNotificationsButton" onclick="cargarNotificaciones()" class="btn">Registros de asistencia</button>
+    </div>
+
+    <div id="content" class="content">
+      <h3>Bienvenido al SITEA-UNA</h3>
+      <p>Este sistema ha sido diseñado para facilitar el acceso a la información y optimizar la gestión de las tutorías académicas. <br>Su propósito es mejorar la eficiencia, la organización y el seguimiento de los procesos relacionados con el acompañamiento estudiantil.<br><br></p>
+      <p><strong> ← Selecciona una opción</strong></p>
+      <p>El contenido se mostrará aquí dependiendo de la opción seleccionada.</p>
+    </div>
+
+    <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow">
+          <div class="modal-header bg-danger text-white">
+            <h5 class="modal-title" id="confirmModalLabel">¿Confirmar acción?</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          </div>
+          <div class="modal-body" id="confirm-message"></div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="confirm-no">Cancelar</button>
+            <button type="button" class="btn btn-danger" id="confirm-yes">Confirmar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="loader" class="d-none text-center mt-4">
+      <div class="spinner-border text-danger" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+      <p class="mt-2">Procesando, por favor espera...</p>
+    </div>
+
+    <div id="notificacion" class="alert d-none mt-3" role="alert"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Botones superiores -->
+  <script>
+      // Al cargar la página, se configura el valor por defecto como "SOD" con rango A6
+      window.onload = function() {
+        setActiveButton("btnSod");
+        google.script.run.saveIDPropertie('A6'); // Llamar a la función de Apps Script con el rango A6 por defecto
+      };
+
+      // Función para manejar la activación de los botones
+      function setActiveButton(buttonId) {
+        var buttons = document.querySelectorAll(".btn");
+        buttons.forEach(function(button) {
+          button.classList.remove("active-btn");
+        });
+        document.getElementById(buttonId).classList.add("active-btn");
+      }
+
+      // Función para manejar el click en los botones
+      document.getElementById("btnSod").onclick = function() {
+        setActiveButton("btnSod");
+        google.script.run.saveIDPropertie('A6'); // Guardar el rango A6
+      };
+
+      document.getElementById("btnSedes").onclick = function() {
+        setActiveButton("btnSedes");
+        google.script.run.saveIDPropertie('A8'); // Guardar el rango A8
+      };
+  </script>
+
+
+  <!-- Menu desplegable -->
+  <script>
+    const toggleBtn = document.getElementById('toggleSidebarBtn');
+    const sidebar = document.getElementById('sidebar');
+
+    toggleBtn.addEventListener('click', () => {
+      sidebar.classList.toggle('sidebar-close');
+      toggleBtn.classList.toggle('active');
+    });
+
+    document.querySelectorAll('.nav-link[data-bs-toggle="collapse"]').forEach(link => {
+      link.addEventListener('click', () => {
+        document.querySelectorAll('.collapse').forEach(collapse => {
+          if (collapse !== document.querySelector(link.getAttribute('href'))) {
+            new bootstrap.Collapse(collapse, { toggle: false }).hide();
+          }
+        });
+      });
+    });
+
+  </script>
+
+  <!-- Script Loader -->
+  <script>
+    function mostrarLoader() {
+      document.getElementById('loader').classList.remove('d-none');
+      document.getElementById('content').classList.add('d-none');
+      ocultarNotificacion();
+    }
+
+    function ocultarLoader() {
+      document.getElementById('loader').classList.add('d-none');
+      document.getElementById('content').classList.remove('d-none');
+    }
+
+    function mostrarNotificacion(mensaje, tipo) {
+      const noti = document.getElementById('notificacion');
+      noti.className = `alert alert-${tipo} mt-3`;
+      noti.textContent = mensaje;
+      noti.classList.remove('d-none');
+    }
+
+    function ocultarNotificacion() {
+      const noti = document.getElementById('notificacion');
+      noti.classList.add('d-none');
+      noti.textContent = '';
+    }
+
+    // Envoltura genérica para ejecutar funciones y mostrar feedback
+    function ejecutarConFeedback(funcionGS, datos, mensajeExito) {
+      mostrarLoader();
+      
+      google.script.run
+        .withSuccessHandler(function(response) {
+          ocultarLoader();
+          
+          // Verificar si la respuesta tiene la estructura esperada
+          if (response && typeof response === 'object') {
+            if (response.success) {
+              mostrarNotificacion(
+                response.message || mensajeExito || "✅ Proceso completado", 
+                "success"
+              );
+              
+              // Log de datos adicionales si existen
+              if (response.data) {
+                console.log("Datos del proceso:", response.data);
+              }
+            } else {
+              mostrarNotificacion(
+                "⚠️ " + (response.error || "Error desconocido"), 
+                "warning"
+              );
+              
+              // Mostrar errores detallados en consola
+              if (response.data && response.data.errores) {
+                console.error("Errores detallados:", response.data.errores);
+              }
+            }
+          } else {
+            // Respuesta inesperada
+            mostrarNotificacion(
+              "⚠️ Respuesta inesperada del servidor", 
+              "warning"
+            );
+            console.warn("Respuesta:", response);
+          }
+        })
+        .withFailureHandler(function(error) {
+          ocultarLoader();
+          mostrarNotificacion(
+            "❌ Error de conexión: " + error.message, 
+            "danger"
+          );
+          console.error("Error completo:", error);
+        })
+        [funcionGS](datos);
+    }
+
+    function ejecutarConFeedbackCliente(funcionGS, datos, mensajeExito, successHandler) {
+      mostrarLoader();
+      google.script.run
+        .withSuccessHandler(function (respuesta) {
+          ocultarLoader();
+          if (successHandler) {
+            successHandler(respuesta); // ejecuta el handler personalizado
+          }
+          mostrarNotificacion(mensajeExito || "¡Proceso completado exitosamente!", "success");
+        })
+        .withFailureHandler(function (err) {
+          ocultarLoader();
+          mostrarNotificacion("❌ Error: " + err.message, "danger");
+        })[funcionGS](datos);
+    }
+
+
+  </script>
+
+  <!-- Actualizar Datos -->
+  <script>
+    function submitForm(metodo) {
+      var form = document.getElementById('sheetForm');
+      var formData = new FormData(form);
+      var selectedSheets = [];
+      for (var pair of formData.entries()) {
+        if (pair[0] === 'sheets') {
+          selectedSheets.push(pair[1]);
+        }
+      }
+
+      let data = selectedSheets;
+
+      switch (metodo) {
+        case "estadisticas":
+          ejecutarConFeedback("actualizarEstadisticas", data, "Estadísticas actualizadas correctamente.");
+          break;
+        case "matriculas":
+          ejecutarConFeedback("actualizarHojaAsistencia1", data, "Matrículas actualizadas correctamente.");
+          break;
+        case "retiros":
+          ejecutarConFeedback("actualizarRetiros1", data, "Retiros actualizados correctamente.");
+          break;
+        case "justificaciones":
+          ejecutarConFeedback("actualizarJustificaciones", data, "Justificaciones actualizadas correctamente.");
+          break;
+        case "asistencias virtuales":
+          ejecutarConFeedback("actualizarAsistenciaV", data, "Asistencias virtuales actualizadas correctamente.");
+          break;
+        case "evaluaciones":
+          ejecutarConFeedback("actualizarEstadisticasEvaluacion", data, "Evaluaciones actualizadas correctamente.");
+          break;
+        case "informes":
+          ejecutarConFeedback("actualizarInformes", null, "Informes actualizados correctamente.");
+          break;
+        case "nuevos estudiantes":
+          ejecutarConFeedback("marcaNuevasMatriculas", data, "Nuevas matrículas marcadas correctamente.");
+          break;
+      }
+
+    }
+
+  </script>
+
+  <!-- Script Ejecuciones -->
+  <script>
+
+    function actualizarHojaAsistencia() {
+      const page = document.getElementById('pages').value;
+      const fila = document.getElementById('fila').value;
+      const filaIni = document.getElementById('filaIni').value;
+      const filaFin = document.getElementById('filaFin').value;
+      const tipo = document.querySelector('input[name="tipo"]:checked')?.value;
+
+      // Validaciones
+      if (!page) {
+        return mostrarNotificacion("Seleccione una hoja de cálculo", "warning");
+      }
+      if (!tipo) {
+        return mostrarNotificacion("Seleccione un tipo de actualización", "warning");
+      }
+      if (tipo === "grupal" && !fila) {
+        return mostrarNotificacion("Debe indicar la fila para actualizar", "warning");
+      }
+      if (tipo === "rango" && (!filaIni || !filaFin)) {
+        return mostrarNotificacion("Debe indicar fila inicial y final", "warning");
+      }
+      if (tipo === "rango" && parseInt(filaIni) > parseInt(filaFin)) {
+        return mostrarNotificacion("La fila inicial debe ser menor a la final", "warning");
+      }
+
+      // Construcción de datos
+      let data = {
+        page,
+        tipo,
+        fila: tipo === "grupal" ? parseInt(fila) : null,
+        filaIni: tipo === "rango" ? parseInt(filaIni) : null,
+        filaFin: tipo === "rango" ? parseInt(filaFin) : null
+      };
+
+      let mensaje = `Se actualizarán las hojas de asistencia:<br><br>
+        <strong>Hoja:</strong> ${data.page}<br>
+        <strong>Tipo:</strong> ${data.tipo}<br>`;
+        
+      if (tipo === "grupal") mensaje += `<strong>Fila:</strong> ${fila}<br>`;
+      if (tipo === "rango") mensaje += `<strong>Rango:</strong> ${filaIni} a ${filaFin}<br>`;
+      if (tipo === "general") mensaje += `<em>Todas las filas desde la fila 4</em><br>`;
+
+      mostrarConfirmacionHTML({
+        titulo: "Confirmar actualización",
+        mensaje,
+        onConfirmar: () => {
+          ejecutarConFeedback(
+            "update_hojaAsistencia",
+            data,
+            "Hojas actualizadas exitosamente"
+          );
+        }
+      });
+    }                                                                                                                                                                                                   
+    
+    function crearForms() {
+      const campus = document.getElementById('Campus').value;
+      const page = document.getElementById('pages').value;
+      const ciclo = document.getElementById('ciclo').value;
+      const anno = document.getElementById('anno').value;
+      const fila = document.getElementById('fila').value;
+      const filaIni = document.getElementById('filaIni').value;
+      const filaFin = document.getElementById('filaFin').value;
+      const tipo = document.querySelector('input[name="tipo"]:checked') ? document.querySelector('input[name="tipo"]:checked').value : '';
+      const formType = document.getElementById('formType').value;
+
+      let data = {
+        campus: campus,
+        page: page,
+        ciclo: ciclo,
+        anno: anno,
+        formType: formType,
+        fila: fila,
+        filaIni: filaIni,
+        filaFin: filaFin,
+        tipo: tipo
+      };
+      
+      let mensaje = `Se crearán formularios de tipo "<strong>${data.formType}</strong>" con los siguientes datos:<br><br>
+      Campus: ${data.campus}<br>
+      Hoja de cálculo: ${data.page}<br>
+      Ciclo y año: ${data.ciclo} ${data.anno}<br>
+      Tipo de creación: ${data.tipo}<br>`;
+
+      if (data.tipo === "grupal") {
+        mensaje += `Fila individual: ${data.fila}<br>`;
+      } else if (data.tipo === "rango") {
+        mensaje += `Filas del ${data.filaIni} al ${data.filaFin}<br>`;
+      } else if (data.tipo === "general") {
+        mensaje += `Se aplicará a todas las filas desde la 4 hasta la última.<br>`;
+      }
+
+
+      mostrarConfirmacionHTML({
+        titulo: "Confirmar creación de formularios",
+        mensaje: mensaje,
+        onConfirmar: () => {
+          ejecutarConFeedback("create_forms", data, "Formularios creados exitosamente.");}
+      });
+      
+    }
+
+    function eliminarForms() {
+      const page = document.getElementById('pages').value;
+      const fila = document.getElementById('fila').value;
+      const filaIni = document.getElementById('filaIni').value;
+      const filaFin = document.getElementById('filaFin').value;
+      const tipo = document.querySelector('input[name="tipo"]:checked') ? document.querySelector('input[name="tipo"]:checked').value : '';
+      const formType = document.getElementById('formType').value;
+
+      let data = {
+        page: page,
+        formType: formType,
+        fila: fila,
+        filaIni: filaIni,
+        filaFin: filaFin,
+        tipo: tipo
+      };
+
+      let mensaje = `Se eliminarán formularios de tipo "<strong>${data.formType}</strong>" con los siguientes datos:<br><br>
+      Hoja de cálculo: ${data.page}<br>
+      Tipo de eliminación: ${data.tipo}<br>`;
+
+      if (data.tipo === "grupal") {
+        mensaje += `Fila individual: ${data.fila}<br>`;
+      } else if (data.tipo === "rango") {
+        mensaje += `Filas del ${data.filaIni} al ${data.filaFin}<br>`;
+      } else if (data.tipo === "general") {
+        mensaje += `Se aplicará a todas las filas desde la 4 hasta la última.<br>`;
+      }
+
+      mostrarConfirmacionHTML({
+      titulo: "Confirmar eliminación de formularios",
+      mensaje: mensaje,
+      onConfirmar: () => {
+        ejecutarConFeedback("delete_forms", data, "Formularios eliminados exitosamente.");}
+      });
+
+    }
+
+    function crearHoja() {
+      const page = document.getElementById('pages').value;
+      const campus = document.getElementById('Campus').value;
+      const periodo = document.getElementById('periodo').value;
+      const fecha = document.getElementById('fecha').value;
+      const fila = document.getElementById('fila').value;
+      const filaIni = document.getElementById('filaIni').value;
+      const filaFin = document.getElementById('filaFin').value;
+      const tipo = document.querySelector('input[name="tipo"]:checked') ? document.querySelector('input[name="tipo"]:checked').value : '';
+
+      let data = {
+        page: page,
+        campus: campus,
+        fecha: fecha,
+        periodo: periodo,
+        fila: fila,
+        filaIni: filaIni,
+        filaFin: filaFin,
+        tipo: tipo
+      };
+
+
+      let mensaje = `Se crearán "<strong>Hojas de Asistencia</strong>" con los siguientes datos:<br><br>
+      Campus: ${data.campus}<br>
+      Hoja de cálculo: ${data.page}<br>
+      Fecha de inicio: ${data.fecha} <br>
+      Periodo: ${data.periodo} <br>
+      Tipo de creación: ${data.tipo}<br>`;
+
+      if (data.tipo === "grupal") {
+        mensaje += `Fila individual: ${data.fila}<br>`;
+      } else if (data.tipo === "rango") {
+        mensaje += `Filas del ${data.filaIni} al ${data.filaFin}<br>`;
+      } else if (data.tipo === "general") {
+        mensaje += `Se aplicará a todas las filas desde la 4 hasta la última.<br>`;
+      }
+
+
+      mostrarConfirmacionHTML({
+        titulo: "Confirmar creación de hojas de asistencia",
+        mensaje: mensaje,
+        onConfirmar: () => {
+          ejecutarConFeedback("create_hojaAsistencia", data, "Hojas creadas exitosamente.");}
+      });
+
+    }
+
+    function eliminarHoja() {
+        const page = document.getElementById('pages').value;
+        const fila = document.getElementById('fila').value;
+        const filaIni = document.getElementById('filaIni').value;
+        const filaFin = document.getElementById('filaFin').value;
+        const tipo = document.querySelector('input[name="tipo"]:checked') ? document.querySelector('input[name="tipo"]:checked').value : '';
+
+        let data = {
+          page: page,
+          fila: fila,
+          filaIni: filaIni,
+          filaFin: filaFin,
+          tipo: tipo
+        };
+
+        let mensaje = `Se eliminarán "<strong>hojas de asistencia</strong>" con los siguientes datos:<br><br>
+        Hoja de cálculo: ${data.page}<br>
+        Tipo de eliminación: ${data.tipo}<br>`;
+
+        if (data.tipo === "grupal") {
+          mensaje += `Fila individual: ${data.fila}<br>`;
+        } else if (data.tipo === "rango") {
+          mensaje += `Filas del ${data.filaIni} al ${data.filaFin}<br>`;
+        } else if (data.tipo === "general") {
+          mensaje += `Se aplicará a todas las filas desde la 4 hasta la última.<br>`;
+        }
+
+        mostrarConfirmacionHTML({
+        titulo: "Confirmar eliminación de hojas de asistencia",
+        mensaje: mensaje,
+        onConfirmar: () => {
+          ejecutarConFeedback("delete_hojaAsistencia", data, "Hojas de asistencia eliminadas exitosamente.");}
+        });
+
+      }
+      function buscarEstudiante() {
+        document.getElementById('loadingSpinner').classList.remove('d-none');
+
+        const tableBody = document.getElementById('resultsTableBody');
+        tableBody.innerHTML = '';
+
+        const infoEstudiante = document.getElementById('infoEstudiante');
+        infoEstudiante.innerHTML = '';
+
+        const correoEstudiante = document.getElementById('correoEstudiante').value;
+
+        google.script.run.withSuccessHandler(data => {
+          const [info, tutorias] = data;
+          
+          if (info.cedula) {
+            infoEstudiante.innerHTML = `
+              <div class="mb-2"><strong>Cédula:</strong> ${info.cedula}</div>
+              <div class="mb-2"><strong>Nombre:</strong> ${info.nombre}</div>
+              <div class="mb-2"><strong>Carrera:</strong> ${info.carrera}</div>
+              <div class="mb-2"><strong>Teléfono:</strong> ${info.telefono}</div>
+            `;
+          } else {
+            infoEstudiante.innerHTML = '<div class="alert alert-warning">Estudiante no encontrado</div>';
+          }
+
+          tutorias.forEach(item => {
+            addRowToTable(item.tutoria, item.area, item.fila, item.link);
+          });
+
+          document.getElementById('loadingSpinner').classList.add('d-none');
+        }).busquedaEstudiante(correoEstudiante);
+      }
+
+    function creaCorreoEstudiante() {
+      const page = document.getElementById('pages').value;
+      const fila = document.getElementById('fila').value;
+      const filaIni = document.getElementById('filaIni').value;
+      const filaFin = document.getElementById('filaFin').value;
+      const tipo = document.querySelector('input[name="tipo"]:checked') ? document.querySelector('input[name="tipo"]:checked').value : '';
+      const formType = document.getElementById('formType').value;
+      const asunto = document.getElementById('asunto').value;
+      const correo = document.getElementById('correo').value;
+
+      let data = {
+        page: page,
+        asunto: asunto,
+        correo: correo,
+        formType: formType,
+        fila: fila,
+        filaIni: filaIni,
+        filaFin: filaFin,
+        tipo: tipo
+      };
+
+      let mensaje = `Se enviará un <strong>correo a estudiantes</strong> con los siguientes datos:<br><br>
+        Tipo de formulario: ${data.formType || 'No especificado'}<br>
+        Hoja de cálculo: ${data.page || 'No especificada'}<br>
+        Tipo de envío: ${data.tipo || 'No especificado'}<br>`;
+
+      if (data.tipo === "grupal") {
+        mensaje += `Fila individual: ${data.fila}<br>`;
+      } else if (data.tipo === "rango") {
+        mensaje += `Filas del ${data.filaIni} al ${data.filaFin}<br>`;
+      } else if (data.tipo === "general") {
+        mensaje += `Se aplicará a todas las filas desde la 4 hasta la última.<br>`;
+      }
+
+      mensaje += `<br><strong>¿Desea proceder con el envío?</strong>`;
+
+      mostrarConfirmacionHTML({
+        titulo: "Confirmar envío de correos",
+        mensaje: mensaje,
+        onConfirmar: () => {
+          ejecutarConFeedback("crearCorreoEstudiante", data, "Correos enviados exitosamente.");
+        }
+      });
+    }
+
+    function creaCorreoTutor() {
+
+        const page = document.getElementById('pages').value;
+        const fila = document.getElementById('fila').value;
+        const filaIni = document.getElementById('filaIni').value;
+        const filaFin = document.getElementById('filaFin').value;
+        const tipo = document.querySelector('input[name="tipo"]:checked') ? document.querySelector('input[name="tipo"]:checked').value : '';
+        const formType = document.getElementById('formType').value;
+        const asunto = document.getElementById('asunto').value;
+        const correo = document.getElementById('correo').value;
+
+        let data = {
+          page: page,
+          asunto: asunto,
+          correo: correo,
+          formType: formType,
+          fila: fila,
+          filaIni: filaIni,
+          filaFin: filaFin,
+          tipo: tipo
+        };
+
+        let mensaje = `Se enviará un <strong>correo a tutores</strong> con los siguientes datos:<br><br>
+          Tipo de formulario: ${data.formType || 'No especificado'}<br>
+          Hoja de cálculo: ${data.page || 'No especificada'}<br>
+          Tipo de envío: ${data.tipo || 'No especificado'}<br>`;
+
+        if (data.tipo === "grupal") {
+          mensaje += `Fila individual: ${data.fila}<br>`;
+        } else if (data.tipo === "rango") {
+          mensaje += `Filas del ${data.filaIni} al ${data.filaFin}<br>`;
+        } else if (data.tipo === "general") {
+          mensaje += `Se aplicará a todas las filas desde la 4 hasta la última.<br>`;
+        }
+
+        mensaje += `<br><strong>¿Desea proceder con el envío?</strong>`;
+
+        mostrarConfirmacionHTML({
+          titulo: "Confirmar envío de correos",
+          mensaje: mensaje,
+          onConfirmar: () => {
+            ejecutarConFeedback("crearCorreoTutor", data, "Correos enviados exitosamente.");
+          }
+        });
+        
+      }
+
+
+      function creaCorreoTodos() {
+
+        const page = document.getElementById('pages').value;
+        const fila = document.getElementById('fila').value;
+        const filaIni = document.getElementById('filaIni').value;
+        const filaFin = document.getElementById('filaFin').value;
+        const tipo = document.querySelector('input[name="tipo"]:checked') ? document.querySelector('input[name="tipo"]:checked').value : '';
+        const formType = document.getElementById('formType').value;
+        const asunto = document.getElementById('asunto').value;
+        const correo = document.getElementById('correo').value;
+
+        let data = {
+          page: page,
+          asunto: asunto,
+          correo: correo,
+          formType: formType,
+          fila: fila,
+          filaIni: filaIni,
+          filaFin: filaFin,
+          tipo: tipo
+        };
+
+        let mensaje = `Se enviará un <strong>correo a estudiantes y tutor</strong> con los siguientes datos:<br><br>
+          Tipo de formulario: ${data.formType || 'No especificado'}<br>
+          Hoja de cálculo: ${data.page || 'No especificada'}<br>
+          Tipo de envío: ${data.tipo || 'No especificado'}<br>`;
+
+        if (data.tipo === "grupal") {
+          mensaje += `Fila individual: ${data.fila}<br>`;
+        } else if (data.tipo === "rango") {
+          mensaje += `Filas del ${data.filaIni} al ${data.filaFin}<br>`;
+        } else if (data.tipo === "general") {
+          mensaje += `Se aplicará a todas las filas desde la 4 hasta la última.<br>`;
+        }
+
+        mensaje += `<br><strong>¿Desea proceder con el envío?</strong>`;
+
+        mostrarConfirmacionHTML({
+          titulo: "Confirmar envío de correos",
+          mensaje: mensaje,
+          onConfirmar: () => {
+            ejecutarConFeedback("crearCorreoTodos", data, "Correos enviados exitosamente.");
+          }
+        });
+        
+      }
+
+  </script>
+
+  <!--Modal-->
+  <script>
+    function mostrarConfirmacionHTML({ titulo, mensaje, onConfirmar = () => {} }) {
+      // Asignar título y mensaje con formato HTML
+      document.getElementById('confirmModalLabel').textContent = titulo;
+      document.getElementById('confirm-message').innerHTML = mensaje; // <- Cambio aquí
+
+      // Mostrar modal
+      const modal = new bootstrap.Modal(document.getElementById('confirmModal'));
+      modal.show();
+
+      // Evento para el botón de confirmación
+      const confirmBtn = document.getElementById('confirm-yes');
+      const handler = () => {
+        onConfirmar();
+        modal.hide();
+        confirmBtn.removeEventListener('click', handler);
+      };
+      confirmBtn.addEventListener('click', handler);
+    }
+  </script>
+
+  <!--Notifications-->
+  <script>
+  function cargarNotificaciones() {
+    ejecutarConFeedbackCliente("obtenerNotificacionesTodas", null, null, displayNotifications);
+  }
+
+  function notificar(title, correoTutor, correo, academico) {
+    let data = {
+      title: title,
+      correoTutor: correoTutor,
+      correo: correo,
+      academico: academico
+    };
+
+    let mensaje = `Se enviará un <strong>correo de registros de asistencia</strong> con los siguientes datos:<br><br>
+      Tutoría: ${data.title || 'Error de nombre'}<br>
+      Persona tutora: ${data.correoTutor || 'Error de correo'}<br>
+      Correo: ${data.correo || 'No especificado'}<br>`;
+
+    mensaje += `<br><strong>¿Desea proceder con el envío?</strong>`;
+
+    mostrarConfirmacionHTML({
+      titulo: "Confirmar envío de correos",
+      mensaje: mensaje,
+      onConfirmar: () => {
+        ejecutarConFeedback("notificarTutor", data, "Correos enviados exitosamente.");
+      }
+    });
+  }
+
+  function displayNotifications(allData) {
+    const content = document.getElementById('content');
+    content.innerHTML = ''; // Limpiar contenido previo
+
+    allData.forEach(sheetData => {
+      const card = document.createElement('div');
+      card.className = 'card mb-4 col-12';
+
+      const cardHeader = document.createElement('div');
+      cardHeader.className = 'card-header text-white';
+      cardHeader.style.backgroundColor = '#003366'; // Color personalizado
+      cardHeader.innerText = `Notificaciones de ${sheetData.sheet}`;
+
+      const cardBody = document.createElement('div');
+      cardBody.className = 'card-body';
+
+      if (sheetData.data.length === 0) {
+        cardBody.innerHTML = '<p>Asistencias al día</p>';
+      } else {
+        const row = document.createElement('div');
+        row.className = 'row';
+
+        sheetData.data.forEach(notification => {
+          const col = document.createElement('div');
+          col.className = 'col-md-4 mb-3';
+
+          const notifDiv = document.createElement('div');
+          notifDiv.className = 'custom-alert shadow-sm p-3 position-relative rounded bg-white';
+
+          const dot = document.createElement('span');
+          dot.className = 'priority-dot position-absolute top-0 end-0 translate-middle rounded-circle';
+
+          switch (notification.prioridad) {
+            case 0:
+              dot.classList.add('bg-secondary'); break;
+            case 1:
+              dot.classList.add('bg-danger'); break;
+            case 2:
+              dot.classList.add('bg-warning'); break;
+            case 3:
+              dot.classList.add('bg-success'); break;
+            default:
+              dot.classList.add('bg-secondary');
+          }
+
+          notifDiv.appendChild(dot);
+
+          const title = document.createElement('h5');
+          title.className = 'fw-semibold';
+          title.innerText = notification.title;
+
+          const message = document.createElement('p');
+          message.innerText = notification.message;
+
+          const btnGroup = document.createElement('div');
+          btnGroup.className = 'd-flex justify-content-start flex-wrap gap-2';
+
+          const verBtn = document.createElement('a');
+          verBtn.href = notification.link;
+          verBtn.target = '_blank';
+          verBtn.className = 'btn btn-outline-secondary btn-sm'; // Botón más sutil
+          verBtn.innerText = 'Ver';
+
+          const notifyBtn = document.createElement('button');
+          notifyBtn.className = 'btn btn-outline-danger btn-sm'; // Sutil pero aún destacado
+          notifyBtn.innerText = 'Notificar';
+          notifyBtn.addEventListener('click', () => {
+            notificar(notification.title, notification.correoTutor, notification.correo, notification.academico);
+          });
+
+          btnGroup.appendChild(verBtn);
+          btnGroup.appendChild(notifyBtn);
+
+          notifDiv.appendChild(title);
+          notifDiv.appendChild(message);
+          notifDiv.appendChild(btnGroup);
+
+          col.appendChild(notifDiv);
+          row.appendChild(col);
+        });
+
+        cardBody.appendChild(row);
+      }
+
+      card.appendChild(cardHeader);
+      card.appendChild(cardBody);
+      content.appendChild(card);
+    });
+  }
+
+  </script>
+
+  <!-- Load Content -->
+  <script>
+    function loadContent(section) {
+      // Limpiar notificaciones y loader
+      document.getElementById("loader").classList.add("d-none");
+      const notificacion = document.getElementById("notificacion");
+      notificacion.className = "alert d-none mt-3";
+      notificacion.innerHTML = "";
+      if (section == 'Crear Formulario') {
+        google.script.run.withSuccessHandler(function(htmlContent) {
+          document.getElementById("content").innerHTML = htmlContent;
+          cargarNombresHojas();
+        }).imprimeCrearFormulario1();
+      }
+      if (section == 'Eliminar Formulario') {
+        google.script.run.withSuccessHandler(function(htmlContent) {
+          document.getElementById("content").innerHTML = htmlContent;
+          cargarNombresHojas();
+        }).imprimeEliminarFormulario1();
+      }
+      if (section == 'Crear Hoja Asistencia') {
+        google.script.run.withSuccessHandler(function(htmlContent) {
+          document.getElementById("content").innerHTML = htmlContent;
+          cargarNombresHojas();
+        }).imprimeCrearHojaAsistencia1();
+      }
+      if (section == 'Eliminar Hoja Asistencia') {
+        google.script.run.withSuccessHandler(function(htmlContent) {
+          document.getElementById("content").innerHTML = htmlContent;
+          cargarNombresHojas();
+        }).imprimeEliminarHojaAsistencia1();
+      }
+      if (section == 'Actualizar Datos Hoja Asistencia') {
+        google.script.run.withSuccessHandler(function(htmlContent) {
+          document.getElementById("content").innerHTML = htmlContent;
+          cargarNombresHojas();
+        }).imprimeActualizarHojaAsistencia();
+      }
+      if (section == 'Crear SESAE') {
+        google.script.run.withSuccessHandler(function(htmlContent) {
+          document.getElementById("content").innerHTML = htmlContent;
+          cargarNombresHojasBases();
+        }).imprimeGenerarSesae();
+      }
+      if (section == 'Crear POA') {
+        google.script.run.withSuccessHandler(function(htmlContent) {
+          document.getElementById("content").innerHTML = htmlContent;
+          cargarNombresHojasBases();
+        }).imprimeGenerarPOA();
+      }
+      if (section == 'Reporte Evaluaciones') {
+        google.script.run.withSuccessHandler(function(htmlContent) {
+          document.getElementById("content").innerHTML = htmlContent;
+          cargarNombresHojasBases();
+        }).imprimeReporteEvaluacion();
+      }
+      if (section == 'Reporte Participacion') {
+        google.script.run.withSuccessHandler(function(htmlContent) {
+          document.getElementById("content").innerHTML = htmlContent;
+          cargarNombresHojasBases();
+        }).imprimeReporteParticipacion();
+      }
+      if(section == 'Busqueda Estudiante'){
+        google.script.run.withSuccessHandler(function(htmlContent) {
+          document.getElementById("content").innerHTML = htmlContent;
+        }).imprimeBusquedaEstudiante1();
+      }
+      if(section == 'Actualizar Datos'){
+        google.script.run.withSuccessHandler(function(htmlContent) {
+          document.getElementById("content").innerHTML = htmlContent;
+        }).imprimeOpcionesDatos1();
+      }
+      if(section == 'Correos Estudiantes'){
+        google.script.run.withSuccessHandler(function(htmlContent) {
+          document.getElementById("content").innerHTML = htmlContent;
+          cargarNombresHojas();
+        }).imprimeCorreosEstudiantes1();
+      }
+      if(section == 'Correos Tutores'){
+        google.script.run.withSuccessHandler(function(htmlContent) {
+          document.getElementById("content").innerHTML = htmlContent;
+          cargarNombresHojas();
+        }).imprimeCorreosTutores1();
+      }
+      if(section == 'Correos Todos'){
+        google.script.run.withSuccessHandler(function(htmlContent) {
+          document.getElementById("content").innerHTML = htmlContent;
+          cargarNombresHojas();
+        }).imprimeCorreosTodos();
+      }
+      if (section == 'Actualizar Estadisticas') {
+        google.script.run.withSuccessHandler(function(htmlContent) {
+          const contentDiv = document.getElementById("content");
+          const newContent = `
+            <div class="card shadow-sm p-4 bg-light rounded">
+              ${htmlContent}
+              <div class="d-flex justify-content-end mt-4">
+                <button class="btn btn-danger d-flex align-items-center gap-2" onclick="submitForm('estadisticas')">
+                  <i class="fas fa-sync-alt"></i>
+                  Actualizar estadísticas
+                </button>
+              </div>
+            </div>
+          `;
+          contentDiv.innerHTML = newContent;
+          google.script.run.withSuccessHandler(displaySheetNames).getSheetNames();
+        }).imprimeSeleccionHoja1();
+      }
+
+      if (section == 'Actualizar Matriculas') {
+        google.script.run.withSuccessHandler(function(htmlContent) {
+          const contentDiv = document.getElementById("content");
+          const newContent = `
+            <div class="card shadow-sm p-4 bg-light rounded">
+              ${htmlContent}
+              <div class="d-flex justify-content-end mt-4">
+                <button class="btn btn-danger d-flex align-items-center gap-2" onclick="submitForm('matriculas')">
+                  <i class="fas fa-sync-alt"></i>
+                  Actualizar matrículas
+                </button>
+              </div>
+            </div>
+          `;
+          contentDiv.innerHTML = newContent;
+          google.script.run.withSuccessHandler(displaySheetNames).getSheetNames();
+        }).imprimeSeleccionHoja1();
+      }
+
+      if (section == 'Actualizar Retiros') {
+        google.script.run.withSuccessHandler(function(htmlContent) {
+          const contentDiv = document.getElementById("content");
+          const newContent = `
+            <div class="card shadow-sm p-4 bg-light rounded">
+              ${htmlContent}
+              <div class="d-flex justify-content-end mt-4">
+                <button class="btn btn-danger d-flex align-items-center gap-2" onclick="submitForm('retiros')">
+                  <i class="fas fa-sync-alt"></i>
+                  Actualizar retiros
+                </button>
+              </div>
+            </div>
+          `;
+          contentDiv.innerHTML = newContent;
+          google.script.run.withSuccessHandler(displaySheetNames).getSheetNames();
+        }).imprimeSeleccionHoja1();
+      }
+
+      if (section == 'Actualizar Justificaciones') {
+        google.script.run.withSuccessHandler(function(htmlContent) {
+          const contentDiv = document.getElementById("content");
+          const newContent = `
+            <div class="card shadow-sm p-4 bg-light rounded">
+              ${htmlContent}
+              <div class="d-flex justify-content-end mt-4">
+                <button class="btn btn-danger d-flex align-items-center gap-2" onclick="submitForm('justificaciones')">
+                  <i class="fas fa-sync-alt"></i>
+                  Actualizar justificaciones
+                </button>
+              </div>
+            </div>
+          `;
+          contentDiv.innerHTML = newContent;
+          google.script.run.withSuccessHandler(displaySheetNames).getSheetNames();
+        }).imprimeSeleccionHoja1();
+      }
+
+      if (section == 'Actualizar Nuevos Estudiantes') {
+        google.script.run.withSuccessHandler(function(htmlContent) {
+          const contentDiv = document.getElementById("content");
+          const newContent = `
+            <div class="card shadow-sm p-4 bg-light rounded">
+              ${htmlContent}
+              <div class="d-flex justify-content-end mt-4">
+                <button class="btn btn-danger d-flex align-items-center gap-2" onclick="submitForm('nuevos estudiantes')">
+                  <i class="fas fa-sync-alt"></i>
+                  Actualizar nuevos estudiantes
+                </button>
+              </div>
+            </div>
+          `;
+          contentDiv.innerHTML = newContent;
+          google.script.run.withSuccessHandler(displaySheetNames).getSheetNames();
+        }).imprimeSeleccionHoja1();
+      }
+
+      if (section == 'Actualizar Asistencia Virtual') {
+        google.script.run.withSuccessHandler(function(htmlContent) {
+          const contentDiv = document.getElementById("content");
+          const newContent = `
+            <div class="card shadow-sm p-4 bg-light rounded">
+              ${htmlContent}
+              <div class="d-flex justify-content-end mt-4">
+                <button class="btn btn-danger d-flex align-items-center gap-2" onclick="submitForm('asistencias virtuales')">
+                  <i class="fas fa-sync-alt"></i>
+                  Actualizar asistencia virtual
+                </button>
+              </div>
+            </div>
+          `;
+          contentDiv.innerHTML = newContent;
+          google.script.run.withSuccessHandler(displaySheetNames).getSheetNames();
+        }).imprimeSeleccionHoja1();
+      }
+
+      if (section == 'Actualizar Evaluaciones') {
+        google.script.run.withSuccessHandler(function(htmlContent) {
+          const contentDiv = document.getElementById("content");
+          const newContent = `
+            <div class="card shadow-sm p-4 bg-light rounded">
+              ${htmlContent}
+              <div class="d-flex justify-content-end mt-4">
+                <button class="btn btn-danger d-flex align-items-center gap-2" onclick="submitForm('evaluaciones')">
+                  <i class="fas fa-sync-alt"></i>
+                  Actualizar evaluaciones
+                </button>
+              </div>
+            </div>
+          `;
+          contentDiv.innerHTML = newContent;
+          google.script.run.withSuccessHandler(displaySheetNames).getSheetNames();
+        }).imprimeSeleccionHoja1();
+      }
+
+      if (section == 'Actualizar Informes') {
+       ejecutarConFeedback("actualizarInformes", null, "Informes actualizados correctamente."); 
+      }
+      if (section == 'Crear Complementos') {
+       ejecutarConFeedback("generarMensajes", null, "Complementos creados exitosamente."); 
+      }
+      if (section == 'Crear Complementos Sedes') {
+       ejecutarConFeedback("generarMensajesSedes", null, "Complementos creados exitosamente."); 
+      }
+
+    }
+
+    function showRowField() {
+
+        const rowField = document.getElementById('rowField');
+        const rowStartField = document.getElementById('rowStartField');
+        const rowEndField = document.getElementById('rowEndField');
+        const tipoCrear = document.querySelector('input[name="tipo"]:checked') ? document.querySelector('input[name="tipo"]:checked').value : '';
+        if (tipoCrear === 'grupal') {
+          rowField.classList.remove('hidden');
+          rowStartField.classList.add('hidden');
+          rowEndField.classList.add('hidden');
+        }else if(tipoCrear == 'rango'){
+          rowStartField.classList.remove('hidden');
+          rowEndField.classList.remove('hidden');
+          rowField.classList.add('hidden');
+        }
+        else {
+          rowField.classList.add('hidden');
+          rowStartField.classList.add('hidden');
+          rowEndField.classList.add('hidden');
+        }
+      }
+
+      // Función para cargar nombres de hojas en el select
+      function cargarNombresHojas() {
+        google.script.run.withSuccessHandler(function(sheetNames) {
+          const select = document.getElementById('pages');
+          // Agregar cada nombre de hoja como una opción
+          sheetNames.forEach(name => {
+            const option = document.createElement('option');
+            option.value = name;
+            option.textContent = name;
+            select.appendChild(option);
+          });
+        }).obtenerNombresHojas();
+      }
+
+      //Muestra las hojas que hay en el documento para seleccionar
+      function displaySheetNames(sheetNames) {
+        var container = document.getElementById('checkboxes');
+        sheetNames.forEach(function(name) {
+          var div = document.createElement('div');
+          div.className = 'checkbox-item';
+          var label = document.createElement('label');
+          var checkbox = document.createElement('input');
+          checkbox.type = 'checkbox';
+          checkbox.name = 'sheets';
+          checkbox.value = name;
+          label.appendChild(checkbox);
+          label.appendChild(document.createTextNode(name));
+          div.appendChild(label);
+          container.appendChild(div);
+        });
+      }
+  </script>
+
+  <!-- Reportes -->
+  <script>
+    function seleccionReporteEvaluacion() {
+      const seleccion1 = Array.from(document.querySelectorAll('input[name="base1"]:checked')).map(cb => cb.value);
+      const seleccion2 = Array.from(document.querySelectorAll('input[name="base2"]:checked')).map(cb => cb.value);
+
+      google.script.run.creaReporteEvaluacion({
+        hojasBase1: seleccion1,
+        hojasBase2: seleccion2
+      });
+    }
+
+    function seleccionReporteParticipacion() {
+      const seleccion1 = Array.from(document.querySelectorAll('input[name="base1"]:checked')).map(cb => cb.value);
+      const seleccion2 = Array.from(document.querySelectorAll('input[name="base2"]:checked')).map(cb => cb.value);
+
+      google.script.run.creaReporteParticipacion({
+        hojasBase1: seleccion1,
+        hojasBase2: seleccion2
+      });
+    }
+
+  </script>
+
+  <!-- Varios -->
+  <script>
+
+    function cargarNombresHojasBases(){  
+      google.script.run.withSuccessHandler(renderBases).obtenerDatosBases();
+    }
+    function renderBases(data) {
+      const cont1 = document.getElementById('base1-checkboxes');
+      data.base1.hojas.forEach(hoja => {
+        const label = document.createElement('label');
+        label.className = 'form-check-label d-block';
+        label.innerHTML = `
+          <input class="form-check-input me-2" type="checkbox" name="base1" value="${hoja}">
+          ${hoja}
+        `;
+        cont1.appendChild(label);
+      });
+
+      const cont2 = document.getElementById('base2-checkboxes');
+      data.base2.hojas.forEach(hoja => {
+        const label = document.createElement('label');
+        label.className = 'form-check-label d-block';
+        label.innerHTML = `
+          <input class="form-check-input me-2" type="checkbox" name="base2" value="${hoja}">
+          ${hoja}
+        `;
+        cont2.appendChild(label);
+      });
+    }
+
+    function enviarSeleccionSESAE() {
+      const seleccion1 = Array.from(document.querySelectorAll('input[name="base1"]:checked')).map(cb => cb.value);
+      const seleccion2 = Array.from(document.querySelectorAll('input[name="base2"]:checked')).map(cb => cb.value);
+
+      google.script.run.creaSESAE({
+        hojasBase1: seleccion1,
+        hojasBase2: seleccion2
+      });
+    }
+    function enviarSeleccionPOA() {
+      const seleccion1 = Array.from(document.querySelectorAll('input[name="base1"]:checked')).map(cb => cb.value);
+      const seleccion2 = Array.from(document.querySelectorAll('input[name="base2"]:checked')).map(cb => cb.value);
+
+      google.script.run.creaReportePOA({
+        hojasBase1: seleccion1,
+        hojasBase2: seleccion2
+      });
+    }
+
+    // Función para agregar una fila a la tabla con los resultados de la búsqueda
+    function addRowToTable(tutoria,area, fila, link) {
+      const tableBody = document.getElementById('resultsTableBody');
+      const row = document.createElement('tr');
+      const tutoriaCell = document.createElement('td');
+      tutoriaCell.innerText = tutoria;
+      const areaCell = document.createElement('td');
+      areaCell.innerText = area;
+      const filaCell = document.createElement('td');
+      filaCell.innerText = fila;
+      const linkCell = document.createElement('td');
+      const linkElement = document.createElement('a');
+
+      linkElement.innerText = 'Tutoría';
+      linkElement.href = link;
+      linkElement.target = '_blank'; // Abrir en una nueva pestaña
+      linkCell.appendChild(linkElement);
+
+      // Agregar las celdas a la fila
+      row.appendChild(tutoriaCell);
+      row.appendChild(areaCell);
+      row.appendChild(filaCell);
+      row.appendChild(linkCell);
+
+      // Agregar la fila a la tabla
+      tableBody.appendChild(row);
+    }
+  </script>
+
+</body>
+</html>
