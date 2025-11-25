@@ -2,6 +2,10 @@
 // Obtiene la hoja llamada "Archivos Base" del archivo activo
 var hojaArchivosBase = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Archivos Base");
 
+// Claves y parámetros para usar caché de script.
+var CACHE_KEY_PROPERTIES = 'SITEA-UNA:baseProperties';
+var CACHE_TTL_SECONDS = 300; // 5 minutos
+
 // ---------------------------------------------------------
 // PROPIEDADES
 // ---------------------------------------------------------
@@ -31,6 +35,9 @@ function saveProperties() {
   scriptProperties.setProperty('carpetaFormsInformeMensual', hojaArchivosBase.getRange('I10').getValue());
   scriptProperties.setProperty('carpetaRespuestaInformeMensual', hojaArchivosBase.getRange('I11').getValue());
   scriptProperties.setProperty('carpetaReportes', hojaArchivosBase.getRange('I12').getValue());
+
+  // Limpiar el caché para que los siguientes llamados a loadProperties obtengan los valores actualizados.
+  CacheService.getScriptCache().remove(CACHE_KEY_PROPERTIES);
 }
 
 // Variables globales que se inicializarán con loadProperties()
@@ -61,30 +68,66 @@ var carpetaRespuestaInformeMensual;
  * y las convierte en objetos de Drive (archivos o carpetas).
  */
 function loadProperties() {
-  var scriptProperties = PropertiesService.getScriptProperties();
-  
+  var cache = CacheService.getScriptCache();
+  var cachedProperties = cache.get(CACHE_KEY_PROPERTIES);
+  var properties;
+
+  if (cachedProperties) {
+    properties = JSON.parse(cachedProperties);
+  } else {
+    var scriptProperties = PropertiesService.getScriptProperties();
+    properties = {
+      idHojaRaiz: scriptProperties.getProperty('idHojaRaiz'),
+      baseHojaAsistencia: scriptProperties.getProperty('baseHojaAsistencia'),
+      formBaseMatricula: scriptProperties.getProperty('formBaseMatricula'),
+      formBaseEvaluacion: scriptProperties.getProperty('formBaseEvaluacion'),
+      formBaseAsistenciaV: scriptProperties.getProperty('formBaseAsistenciaV'),
+      formBaseInformeMensual: scriptProperties.getProperty('formBaseInformeMensual'),
+      carpetaHojasAsistencia: scriptProperties.getProperty('carpetaHojasAsistencia'),
+      carpetaFormsMatricula: scriptProperties.getProperty('carpetaFormsMatricula'),
+      carpetaFormsEvaluacion: scriptProperties.getProperty('carpetaFormsEvaluacion'),
+      carpetaFormsAsistenciaVirtual: scriptProperties.getProperty('carpetaFormsAsistenciaVirtual'),
+      carpetaFormsInformeMensual: scriptProperties.getProperty('carpetaFormsInformeMensual'),
+      carpetaReportes: scriptProperties.getProperty('carpetaReportes'),
+      carpetaRespuestaMatriculas: scriptProperties.getProperty('carpetaRespuestaMatriculas'),
+      carpetaRespuestaEvaluacion: scriptProperties.getProperty('carpetaRespuestaEvaluacion'),
+      carpetaRespuestaAsistenciaV: scriptProperties.getProperty('carpetaRespuestaAsistenciaV'),
+      carpetaRespuestaInformeMensual: scriptProperties.getProperty('carpetaRespuestaInformeMensual')
+    };
+
+    cache.put(CACHE_KEY_PROPERTIES, JSON.stringify(properties), CACHE_TTL_SECONDS);
+  }
+
+  // Validación temprana para evitar fallos por propiedades faltantes.
+  var requiredKeys = Object.keys(properties);
+  requiredKeys.forEach(function(key) {
+    if (!properties[key]) {
+      throw new Error('La propiedad "' + key + '" no está configurada en Archivos Base. Ejecuta saveProperties nuevamente.');
+    }
+  });
+
   // Bases
-  idHojaRaiz = scriptProperties.getProperty('idHojaRaiz');
-  hojaAsistenciaSheet = SpreadsheetApp.openById(scriptProperties.getProperty('baseHojaAsistencia'));
-  baseHojaAsistencia = DriveApp.getFileById(scriptProperties.getProperty('baseHojaAsistencia'));
-  formBaseMatricula = DriveApp.getFileById(scriptProperties.getProperty('formBaseMatricula'));
-  formBaseEvaluacion = DriveApp.getFileById(scriptProperties.getProperty('formBaseEvaluacion'));
-  formBaseAsistenciaV = DriveApp.getFileById(scriptProperties.getProperty('formBaseAsistenciaV'));
-  formBaseInformeMensual = DriveApp.getFileById(scriptProperties.getProperty('formBaseInformeMensual'));
+  idHojaRaiz = properties.idHojaRaiz;
+  hojaAsistenciaSheet = SpreadsheetApp.openById(properties.baseHojaAsistencia);
+  baseHojaAsistencia = DriveApp.getFileById(properties.baseHojaAsistencia);
+  formBaseMatricula = DriveApp.getFileById(properties.formBaseMatricula);
+  formBaseEvaluacion = DriveApp.getFileById(properties.formBaseEvaluacion);
+  formBaseAsistenciaV = DriveApp.getFileById(properties.formBaseAsistenciaV);
+  formBaseInformeMensual = DriveApp.getFileById(properties.formBaseInformeMensual);
 
   // Carpetas de archivos
-  carpetaHojasAsistencia = DriveApp.getFolderById(scriptProperties.getProperty('carpetaHojasAsistencia'));
-  carpetaFormsMatricula = DriveApp.getFolderById(scriptProperties.getProperty('carpetaFormsMatricula'));
-  carpetaFormsEvaluacion = DriveApp.getFolderById(scriptProperties.getProperty('carpetaFormsEvaluacion'));
-  carpetaFormsAsistenciaVirtual = DriveApp.getFolderById(scriptProperties.getProperty('carpetaFormsAsistenciaVirtual'));
-  carpetaFormsInformeMensual = DriveApp.getFolderById(scriptProperties.getProperty('carpetaFormsInformeMensual'));
-  carpetaReportes = DriveApp.getFolderById(scriptProperties.getProperty('carpetaReportes'));
-  
+  carpetaHojasAsistencia = DriveApp.getFolderById(properties.carpetaHojasAsistencia);
+  carpetaFormsMatricula = DriveApp.getFolderById(properties.carpetaFormsMatricula);
+  carpetaFormsEvaluacion = DriveApp.getFolderById(properties.carpetaFormsEvaluacion);
+  carpetaFormsAsistenciaVirtual = DriveApp.getFolderById(properties.carpetaFormsAsistenciaVirtual);
+  carpetaFormsInformeMensual = DriveApp.getFolderById(properties.carpetaFormsInformeMensual);
+  carpetaReportes = DriveApp.getFolderById(properties.carpetaReportes);
+
   // Carpetas de respuestas
-  carpetaRespuestaMatriculas = DriveApp.getFolderById(scriptProperties.getProperty('carpetaRespuestaMatriculas'));
-  carpetaRespuestaEvaluacion = DriveApp.getFolderById(scriptProperties.getProperty('carpetaRespuestaEvaluacion'));
-  carpetaRespuestaAsistenciaV = DriveApp.getFolderById(scriptProperties.getProperty('carpetaRespuestaAsistenciaV'));
-  carpetaRespuestaInformeMensual = DriveApp.getFolderById(scriptProperties.getProperty('carpetaRespuestaInformeMensual'));
+  carpetaRespuestaMatriculas = DriveApp.getFolderById(properties.carpetaRespuestaMatriculas);
+  carpetaRespuestaEvaluacion = DriveApp.getFolderById(properties.carpetaRespuestaEvaluacion);
+  carpetaRespuestaAsistenciaV = DriveApp.getFolderById(properties.carpetaRespuestaAsistenciaV);
+  carpetaRespuestaInformeMensual = DriveApp.getFolderById(properties.carpetaRespuestaInformeMensual);
 }
 
 
