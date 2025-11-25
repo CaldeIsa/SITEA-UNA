@@ -1,9 +1,9 @@
-// menu principal
-
-
+// Punto de entrada web: sirve la vista principal con las propiedades cargadas.
 function doGet(request) {
-  return HtmlService.createTemplateFromFile('MenuPrincipal2')
-      .evaluate();
+  loadProperties();
+  return HtmlService.createTemplateFromFile('MenuPrincipal')
+      .evaluate()
+      .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 
 /*<?!= include('StyleMenuPrincipal'); ?>
@@ -38,17 +38,16 @@ function onOpen() {
 }
 function mostrarMenuPrincipal2() {
   loadProperties();
-  var htmlOutput = HtmlService.createHtmlOutputFromFile('MenuPrincipal2')
+  var htmlOutput = HtmlService.createHtmlOutputFromFile('MenuPrincipal')
       .setWidth(1500)
       .setHeight(750);
   SpreadsheetApp.getUi().showModalDialog(htmlOutput, 'Sistema de tutorias de éxito académico UNA');
-  
 }
+
 function mostrarMenuPrincipal3() {
   loadProperties();
-  var htmlOutput = HtmlService.createHtmlOutputFromFile('MenuPrincipal3')
+  var htmlOutput = HtmlService.createHtmlOutputFromFile('MenuPrincipal')
       .setWidth(1500)
       .setHeight(750);
   SpreadsheetApp.getUi().showModalDialog(htmlOutput, 'Sistema de tutorias de éxito académico UNA');
-  
 }
