@@ -18,6 +18,7 @@ function saveProperties() {
   var scriptProperties = PropertiesService.getScriptProperties();
 
   // Bases
+  scriptProperties.setProperty('idHojaRaiz', hojaArchivosBase.getRange('A6').getValue());
   scriptProperties.setProperty('baseHojaAsistencia', hojaArchivosBase.getRange('E3').getValue());
   scriptProperties.setProperty('formBaseMatricula', hojaArchivosBase.getRange('E4').getValue());
   scriptProperties.setProperty('formBaseEvaluacion', hojaArchivosBase.getRange('E5').getValue());
@@ -141,7 +142,8 @@ function saveIDPropertie(rango) {
   var id = hojaArchivosBase.getRange(rango).getValue();
 
   scriptProperties.setProperty('idHojaRaiz', id);
-} 
+  CacheService.getScriptCache().remove(CACHE_KEY_PROPERTIES);
+}
 
 
 
