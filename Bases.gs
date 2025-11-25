@@ -99,17 +99,6 @@ function loadProperties() {
     cache.put(CACHE_KEY_PROPERTIES, JSON.stringify(properties), CACHE_TTL_SECONDS);
   }
 
-  // Asigna un valor predeterminado para idHojaRaiz si aún no existe para evitar fallos en la carga inicial.
-  if (!properties.idHojaRaiz) {
-    var idPorDefecto = hojaArchivosBase.getRange('A6').getValue() || hojaArchivosBase.getRange('A8').getValue();
-
-    if (idPorDefecto) {
-      properties.idHojaRaiz = idPorDefecto;
-      PropertiesService.getScriptProperties().setProperty('idHojaRaiz', idPorDefecto);
-      cache.put(CACHE_KEY_PROPERTIES, JSON.stringify(properties), CACHE_TTL_SECONDS);
-    }
-  }
-
   // Validación temprana para evitar fallos por propiedades faltantes.
   var requiredKeys = Object.keys(properties);
   requiredKeys.forEach(function(key) {
